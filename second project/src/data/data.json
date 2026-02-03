@@ -1,0 +1,28 @@
+{
+    "popularproducts":[
+        {
+            "id":1,
+            "name":"Ipad 8",
+            "category":"Tablet",
+            "price":"$800",
+            "image":"https://images.unsplash.com/photo-1525101238777-8878781fc06d",
+            "description":"mmy text ever since the 1500s, when an unknown printer"
+        },
+            {
+            "id":1,
+            "name":"Ipad X",
+            "category":"Tablet",
+            "price":"$750",
+            "image":"https://images.unsplash.com/photo-1530319067432-f2a729c03db5",
+            "description":"mmy text ever since the 1500s, when an unknown printer"
+        },
+            {
+            "id":1,
+            "name":"samsung s21",
+            "category":"Tablet",
+            "price":"$990",
+            "image": "https://images.unsplash.com/photo-1610945264803-c22b62d2a7b3",
+            "description":"mmy text ever since the 1500s, when an unknown printer"
+        }
+    ]
+}
