@@ -1,96 +1,144 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 
 export default function App() {
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [name, setName] = useState("");
   const [page, setPage] = useState("Home");
 
-  const balance = 5420;
+  const [balance, setBalance] = useState(5420);
+
+  const [receiver, setReceiver] = useState("");
+  const [amount, setAmount] = useState("");
 
   const menuItems = [
+    "Home",
+    "Transfer",
     "Llogaritë",
     "Kreditë",
-    "Kartelat",
-    "Sigurimi",
-    "Kanalet",
-    "Ofertat",
-    "Apliko"
+    "Kartelat"
   ];
 
-  function renderPage(){
+  // 🔐 LOGIN SCREEN
+  if(!isLoggedIn){
     return (
-      <View style={styles.pageContainer}>
-        <Text style={styles.pageTitle}>{page}</Text>
+      <View style={styles.loginContainer}>
+        <Text style={styles.title}>Login</Text>
 
-        <TouchableOpacity style={styles.back} onPress={()=>setPage("Home")}>
-          <Text style={styles.backText}>Kthehu</Text>
+        <TextInput
+          placeholder="Emri"
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+        />
+
+        <TouchableOpacity
+          style={styles.loginBtn}
+          onPress={() => setIsLoggedIn(true)}
+        >
+          <Text style={styles.loginText}>Hyr</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  // 💸 TRANSFER FUNCTION
+  const handleTransfer = () => {
+    const amt = parseFloat(amount);
+
+    if(!receiver || !amt){
+      alert("Plotëso të dhënat!");
+      return;
+    }
+
+    if(amt > balance){
+      alert("Nuk ke mjaftueshëm para!");
+      return;
+    }
+
+    setBalance(balance - amt);
+    setReceiver("");
+    setAmount("");
+
+    alert("Transfer u krye!");
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
 
-      {/* HEADER */}
-      <Text style={styles.welcome}>Mirë se vini 👋</Text>
-      <Text style={styles.name}>Bleart</Text>
+      {/* HEADER + LOGOUT */}
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Banka Ime</Text>
 
-      {/* BALANCE */}
+        <TouchableOpacity
+          style={styles.logoutBtn}
+          onPress={() => setIsLoggedIn(false)}
+        >
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.welcome}>Mirë se vini, {name}</Text>
+
+      {/* 💰 BALANCE */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Bilanci</Text>
         <Text style={styles.balance}>€{balance}</Text>
       </View>
 
-      {/* QUICK ACTIONS */}
-      <View style={styles.quickRow}>
-        <TouchableOpacity style={styles.quickBtn}>
-          <Text>Transfer</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.quickBtn}>
-          <Text>Pay</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.quickBtn}>
-          <Text>Top Up</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* MENU VERTIKALE */}
-      {page === "Home" ? (
-        menuItems.map((item, index) => (
+      {/* 🔥 MENU */}
+      <View style={styles.menuRow}>
+        {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.item}
-            onPress={()=>setPage(item)}
+            style={styles.menuItem}
+            onPress={() => setPage(item)}
           >
-            <Text style={styles.text}>{item}</Text>
+            <Text>{item}</Text>
           </TouchableOpacity>
-        ))
-      ) : (
-        renderPage()
+        ))}
+      </View>
+
+      {/* PAGES */}
+      {page === "Home" && (
+        <View style={styles.page}>
+          <Text style={styles.pageText}>Ballina</Text>
+        </View>
       )}
 
-      {/* TRANSAKSIONE */}
-      <Text style={styles.section}>Transaksionet</Text>
+      {page === "Transfer" && (
+        <View style={styles.page}>
+          <Text style={styles.pageText}>Transfer</Text>
 
-      <View style={styles.transaction}>
-        <Text>Market</Text>
-        <Text>-€50</Text>
-      </View>
+          <TextInput
+            placeholder="Marrësi"
+            style={styles.input}
+            value={receiver}
+            onChangeText={setReceiver}
+          />
 
-      <View style={styles.transaction}>
-        <Text>Salary</Text>
-        <Text>+€1200</Text>
-      </View>
+          <TextInput
+            placeholder="Shuma (€)"
+            style={styles.input}
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+          />
 
-      <View style={styles.transaction}>
-        <Text>Netflix</Text>
-        <Text>-€10</Text>
-      </View>
+          <TouchableOpacity style={styles.transferBtn} onPress={handleTransfer}>
+            <Text style={styles.transferText}>Dërgo</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
-    </ScrollView>
+      {page !== "Home" && page !== "Transfer" && (
+        <View style={styles.page}>
+          <Text style={styles.pageText}>{page}</Text>
+        </View>
+      )}
+
+    </View>
   );
 }
 
@@ -98,105 +146,120 @@ const styles = StyleSheet.create({
 
   container:{
     flex:1,
-    backgroundColor:"#f2f4f7",
     paddingTop:60,
-    paddingHorizontal:20
+    paddingHorizontal:20,
+    backgroundColor:"#eef2f7"
+  },
+
+  headerRow:{
+    flexDirection:"row",
+    justifyContent:"space-between",
+    alignItems:"center",
+    marginBottom:10
+  },
+
+  title:{
+    fontSize:26,
+    fontWeight:"bold"
+  },
+
+  logoutBtn:{
+    backgroundColor:"#ff5c5c",
+    paddingVertical:6,
+    paddingHorizontal:12,
+    borderRadius:8
+  },
+
+  logoutText:{
+    color:"white",
+    fontWeight:"bold"
   },
 
   welcome:{
-    fontSize:18,
-    color:"#555"
-  },
-
-  name:{
-    fontSize:28,
-    fontWeight:"bold",
+    textAlign:"center",
     marginBottom:20
   },
 
   card:{
     backgroundColor:"#2e86de",
-    padding:25,
+    padding:20,
     borderRadius:15,
     marginBottom:20
   },
 
   cardTitle:{
-    color:"white",
-    fontSize:16
+    color:"white"
   },
 
   balance:{
     color:"white",
-    fontSize:30,
+    fontSize:28,
     fontWeight:"bold",
     marginTop:10
   },
 
-  quickRow:{
+  menuRow:{
     flexDirection:"row",
-    justifyContent:"space-between",
+    flexWrap:"wrap",
+    justifyContent:"center",
     marginBottom:20
   },
 
-  quickBtn:{
+  menuItem:{
+    backgroundColor:"white",
+    padding:10,
+    borderRadius:10,
+    margin:5
+  },
+
+  page:{
+    alignItems:"center"
+  },
+
+  pageText:{
+    fontSize:22,
+    fontWeight:"bold",
+    marginBottom:15
+  },
+
+  input:{
     backgroundColor:"white",
     padding:15,
     borderRadius:10,
-    width:90,
-    alignItems:"center"
-  },
-
-  /* 🔥 MENU VERTIKALE */
-  item:{
-    backgroundColor:"#2e86de",
-    paddingVertical:12,
-    borderRadius:12,
-    marginBottom:10,
-    alignItems:"center"
-  },
-
-  text:{
-    color:"white",
-    fontSize:18,
-    fontWeight:"bold"
-  },
-
-  section:{
-    fontSize:20,
-    fontWeight:"bold",
-    marginTop:20,
+    width:"100%",
     marginBottom:10
   },
 
-  transaction:{
-    backgroundColor:"white",
+  transferBtn:{
+    backgroundColor:"#2e86de",
     padding:15,
     borderRadius:10,
-    marginBottom:10,
-    flexDirection:"row",
-    justifyContent:"space-between"
+    width:"100%",
+    alignItems:"center"
   },
 
-  pageContainer:{
-    alignItems:"center",
-    marginTop:50
-  },
-
-  pageTitle:{
-    fontSize:28,
+  transferText:{
+    color:"white",
     fontWeight:"bold"
   },
 
-  back:{
-    marginTop:20,
-    backgroundColor:"#2e86de",
-    padding:10,
-    borderRadius:10
+  loginContainer:{
+    flex:1,
+    justifyContent:"center",
+    padding:20,
+    backgroundColor:"#eef2f7"
   },
 
-  backText:{
-    color:"white"
+  loginBtn:{
+    backgroundColor:"#2e86de",
+    padding:15,
+    borderRadius:10,
+    alignItems:"center"
+  },
+
+  loginText:{
+    color:"white",
+    fontWeight:"bold"
   }
 
 });
