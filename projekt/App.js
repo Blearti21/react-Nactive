@@ -62,7 +62,7 @@ export default function App() {
     const newUser = {
       name,
       bankId: (1000 + users.length + 1).toString(),
-      balance: 0,
+      balance: 5000,
       password
     };
     setUsers([...users,newUser]);
@@ -109,6 +109,33 @@ export default function App() {
     setReceiver("");
     setAmount("");
     Alert.alert("Sukses", `Transfer i suksesshëm: €${amt} → ${updatedUsers[targetUserIndex].name}`);
+  };
+  // ... (krejt importet dhe state mbesin njësoj)
+
+  // ===== DEPOSIT =====
+  const handleDeposit = () => {
+    const amt = parseFloat(amount);
+    if(!amt) return alert("Shkruaj shumën!");
+    if(amt <= 0) return alert("Shumë e pavlefshme!");
+
+    const updatedUsers = [...users];
+    updatedUsers[users.findIndex(u=>u.bankId===loggedUser.bankId)].balance += amt;
+    setUsers(updatedUsers);
+
+    setLoggedUser({...loggedUser, balance: loggedUser.balance + amt});
+
+    setTransactions([
+      {
+        id: Date.now().toString(),
+        title: "Depozitim",
+        amount: amt,
+        date: new Date().toLocaleDateString()
+      },
+      ...transactions
+    ]);
+
+    setAmount("");
+    Alert.alert("Sukses", `€${amt} u depozituan`);
   };
 
   // PAY ONLINE / QR
@@ -276,6 +303,7 @@ export default function App() {
         <Btn label="Top Up" onPress={()=>setPage("TopUp")} />
         <Btn label="History" onPress={()=>setPage("History")} />
         <Btn label="Stats" onPress={()=>setPage("Stats")} />
+        <Btn label="Deposit" onPress={()=>setPage("Deposit")} />
       </View>
 
       {/* ========================= */}
@@ -411,6 +439,21 @@ export default function App() {
           )}
         />
       )}
+      {/* DEPOSIT */}
+    {page === "Deposit" && (
+      <View>
+       <TextInput
+       placeholder="Shuma (€)"
+      style={styles.input}
+        keyboardType="numeric"
+       value={amount}
+       onChangeText={setAmount}
+    />
+    <TouchableOpacity style={styles.btn} onPress={handleDeposit}>
+      <Text style={styles.btnText}>Depozito</Text>
+    </TouchableOpacity>
+  </View>
+)}
 
       {/* STATS */}
       {page === "Stats" && (
